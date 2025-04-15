@@ -9,7 +9,7 @@ const Part = (props) => (
 const Content = ({parts}) => (
   <div>
     {parts.map((p) =>
-      <Part key={p.name} part={p} />
+      <Part key={p.id} part={p} />
     )}
   </div>
 )
@@ -22,7 +22,7 @@ const Total = ({parts}) => (
     </p>
 )
 
-const Course = ({course}) => {
+const Subcourse = ({course}) => {
   return (
     <div>
       <Header course={course.name} />
@@ -32,29 +32,62 @@ const Course = ({course}) => {
   )
 }
 
+const Course = ({course}) => {
+  return (
+    <div>
+      {course.map((course) => (
+        <Subcourse key={course.id} course={course} />
+      ))}
+    </div>
+  )
+}
+
 const App = () => {
-  const c = {
-    name: 'Half Stack application development',
-    parts: [
-      {
-        name: 'Fundamentals of React',
-        exercises: 10,
-      },
-      {
-        name: 'Using props to pass data',
-        exercises: 7,
-      },
-      {
-        name: 'State of a component',
-        exercises: 14,
-      },
-      {
-        name: 'Redux',
-        exercises: 11,
-      },
-    ],
-  }
-  return <Course course={c} />
+  const courses = [
+    {
+      name: 'Half Stack application development',
+      id: 1,
+      parts: [
+        {
+          name: 'Fundamentals of React',
+          exercises: 10,
+          id: 1
+        },
+        {
+          name: 'Using props to pass data',
+          exercises: 7,
+          id: 2
+        },
+        {
+          name: 'State of a component',
+          exercises: 14,
+          id: 3
+        },
+        {
+          name: 'Redux',
+          exercises: 11,
+          id: 4
+        }
+      ]
+    }, 
+    {
+      name: 'Node.js',
+      id: 2,
+      parts: [
+        {
+          name: 'Routing',
+          exercises: 3,
+          id: 1
+        },
+        {
+          name: 'Middlewares',
+          exercises: 7,
+          id: 2
+        }
+      ]
+    }
+  ]
+  return <Course course={courses} />
 }
 
 export default App
