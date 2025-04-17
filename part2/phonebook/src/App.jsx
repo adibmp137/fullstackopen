@@ -2,16 +2,10 @@ import { useState } from 'react'
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { 
-      id: 1,
-      name: 'Arto Hellas',
-      number: '040-1234567',
-    },
-    { 
-      id: 2,
-      name: 'Ada Locelace',
-      number: '39-44-5323523' ,
-    }
+    { name: 'Arto Hellas', number: '040-123456', id: 1 },
+    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
+    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
+    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
   ]) 
   const [newName, setNewName] = useState('')
 
@@ -32,10 +26,11 @@ const App = () => {
 
   const submitForm = (event) => {
     event.preventDefault()
-    newName === ('') ? alert(`Name field cannot be empty`) : 
-    persons.some((person) => person.name === newName)
-    ? alert(`${newName} is already added to phonebook`)
-    : addPerson(event)
+    newName === ('') 
+      ? alert(`Name field cannot be empty`) 
+      : persons.some((person) => person.name === newName)
+        ? alert(`${newName} is already added to phonebook`)
+        : addPerson(event)
   }
 
   const [newNumber, setNewNumber] = useState('')
@@ -44,9 +39,27 @@ const App = () => {
     setNewNumber(event.target.value)
   }
 
+
+  const [searchedPerson, setSearchedPerson] = useState('')
+  const handleSearchChange = (event) => {
+    setSearchedPerson(event.target.value)
+  }
+  const [shownPerson, setShownPerson] = useState(persons)
+
+  const personsToShow = 
+  searchedPerson === '' 
+    ? persons 
+    : persons.filter((person) => 
+        person.name.toLowerCase().includes(searchedPerson.toLowerCase())
+      );
+
   return (
     <div>
       <h2>Phonebook</h2>
+      <div>
+        filter shown with <input value={searchedPerson} onChange={handleSearchChange}/>
+      </div>
+      <h2>add a new</h2>
       <form onSubmit={submitForm}>
         <div>
           name: <input value={newName} onChange={handleNameChange}/>
@@ -59,9 +72,9 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-      {persons.map((person) => <div key={person.id}>{person.name} {person.number}</div>)}
+      {personsToShow.map((person) => <div key={person.id}>{person.name} {person.number}</div>)}
       <br />
-      <div>debug: {newName} {newNumber}</div>
+      <div>debug:{searchedPerson}</div>
     
     </div>
 
