@@ -1,5 +1,37 @@
 import { useState } from 'react'
 
+const Filter = ({ searchedPerson, handleSearchChange }) => {
+  return (
+    <div>
+      filter shown with <input value={searchedPerson} onChange={handleSearchChange}/>
+    </div>
+  )
+}
+
+const PersonForm = ({ submitForm, newName, handleNameChange, newNumber, handleNumberChange }) => {
+  return (
+    <form onSubmit={submitForm}>
+    <div>
+      name: <input value={newName} onChange={handleNameChange}/>
+    </div>
+    <div>
+      number: <input value={newNumber} onChange={handleNumberChange}/>
+    </div>
+    <div>
+      <button type="submit">add</button>
+    </div>
+  </form>
+  )
+}
+
+const Persons = ({ personsToShow}) => {
+  return ( 
+    <div>
+      {personsToShow.map((person) => <div key={person.id}>{person.name} {person.number}</div>)}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456', id: 1 },
@@ -39,11 +71,12 @@ const App = () => {
     setNewNumber(event.target.value)
   }
 
-
   const [searchedPerson, setSearchedPerson] = useState('')
+
   const handleSearchChange = (event) => {
     setSearchedPerson(event.target.value)
   }
+
   const [shownPerson, setShownPerson] = useState(persons)
 
   const personsToShow = 
@@ -56,28 +89,12 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with <input value={searchedPerson} onChange={handleSearchChange}/>
-      </div>
+      <Filter {...{ searchedPerson, handleSearchChange }}/>
       <h2>add a new</h2>
-      <form onSubmit={submitForm}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange}/>
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange}/>
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm {...{ submitForm, newName, handleNameChange, newNumber, handleNumberChange }} />
       <h2>Numbers</h2>
-      {personsToShow.map((person) => <div key={person.id}>{person.name} {person.number}</div>)}
-      <br />
-      <div>debug:{searchedPerson}</div>
-    
+      <Persons {...{ personsToShow}} />
     </div>
-
   )
 }
 
