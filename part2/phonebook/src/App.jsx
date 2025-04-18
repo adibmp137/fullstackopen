@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import noteService from './services/notes'
 
-const Notification = ({ message }) => {
+const Notification = ({ message, color }) => {
   const notificationStyle = {
-    color: 'green',
+    color: color,
     background: 'lightgrey',
     fontSize: 20,
     borderStyle: 'solid',
@@ -63,6 +63,7 @@ const Persons = ({ personsToShow, deleteHandler }) => {
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [errorMessage, setErrorMessage] = useState(null)
+  const [errorColor, setErrorColor] = useState('green')
   
   useEffect(() => {
     noteService.getAll().then(initialPersons => {setPersons(initialPersons)})
@@ -95,6 +96,16 @@ const App = () => {
       noteService.update(targetContact.id, updatedTargetContact)
       .then((returnedContact) => {
         setPersons(persons.map((person) => person === targetContact ? returnedContact : person ))
+      })
+      .catch(error => {
+        setErrorColor('red')
+        setErrorMessage(`Information of ${newName} has already been removed from server`)
+        setTimeout(() => {
+          setErrorColor('green')
+          setErrorMessage(null)
+        }, 5000)
+        setPersons(persons.filter(n => n.id !== targetContact.id))
+        console.log('error')
       })
     }
   }
@@ -143,7 +154,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={errorMessage} />
+      <Notification message={errorMessage} color={errorColor} />
       <Filter {...{ searchedPerson, handleSearchChange }}/>
       <h2>add a new</h2>
       <PersonForm {...{ submitForm, newName, handleNameChange, newNumber, handleNumberChange }} />
