@@ -35,6 +35,7 @@ const Persons = ({ personsToShow}) => {
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
+  const baseUrl = 'http://localhost:3001/persons'
 
   useEffect(() => {
     axios
@@ -48,11 +49,10 @@ const App = () => {
 
   const addPerson = (event) => {
     const personObject = {
-      id: String(persons.length + 1),
       name: newName,
       number: newNumber,
     }
-    setPersons(persons.concat(personObject))
+    axios.post(baseUrl, personObject).then(r => setPersons(persons.concat(r.data)))
     setNewName('')
     setNewNumber('')
   }
