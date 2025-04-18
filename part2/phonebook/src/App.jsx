@@ -54,12 +54,21 @@ const App = () => {
       number: newNumber,
     }
     noteService.create(personObject).then(newPerson => setPersons(persons.concat(newPerson)))
-    setNewName('')
-    setNewNumber('')
   }
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
+  }
+ 
+  const updateContact = () => {
+    const targetContact = persons.find((p) => p.name === newName)
+    const updatedTargetContact = { ...targetContact, number: newNumber }
+    if (confirm(`${ newName } is already added to phonebook, replace the old number with a new one?`)) {
+      noteService.update(targetContact.id, updatedTargetContact)
+      .then((returnedContact) => {
+        setPersons(persons.map((person) => person === targetContact ? returnedContact : person ))
+      })
+    }
   }
 
   const submitForm = (event) => {
@@ -67,8 +76,10 @@ const App = () => {
     newName === ('') 
       ? alert(`Name field cannot be empty`) 
       : persons.some((person) => person.name === newName)
-        ? alert(`${newName} is already added to phonebook`)
+        ? updateContact()
         : addPerson(event)
+    setNewName('')
+    setNewNumber('')
   }
 
   const [newNumber, setNewNumber] = useState('')
