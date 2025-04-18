@@ -26,10 +26,15 @@ const PersonForm = ({ submitForm, newName, handleNameChange, newNumber, handleNu
   )
 }
 
-const Persons = ({ personsToShow}) => {
+
+const Persons = ({ personsToShow, deleteHandler }) => {
   return ( 
     <div>
-      {personsToShow.map((person) => <div key={person.id}>{person.name} {person.number}</div>)}
+      {personsToShow.map((person) => 
+      <div key={person.id}>
+        {person.name} {person.number} <button onClick={() => deleteHandler(person)}>delete</button>
+      </div>)
+      }
     </div>
   )
 }
@@ -38,7 +43,7 @@ const App = () => {
   const [persons, setPersons] = useState([]) 
   
   useEffect(() => {
-    noteService.getAll().then(initialPerson => {setPersons(initialPerson)})
+    noteService.getAll().then(initialPersons => {setPersons(initialPersons)})
   }, [])
 
   const [newName, setNewName] = useState('')
@@ -86,7 +91,16 @@ const App = () => {
     : persons.filter((person) => 
         person.name.toLowerCase().includes(searchedPerson.toLowerCase())
       );
-
+  
+  const deleteHandler = (person) => {
+    if (confirm(`Delete ${person.name} ?`)) {
+      noteService.remove(person.id)
+      .then(() => {
+        setPersons(persons.filter((initialPersons) => initialPersons.id !== person.id))
+      })
+    }
+  }
+  
   return (
     <div>
       <h2>Phonebook</h2>
@@ -94,7 +108,7 @@ const App = () => {
       <h2>add a new</h2>
       <PersonForm {...{ submitForm, newName, handleNameChange, newNumber, handleNumberChange }} />
       <h2>Numbers</h2>
-      <Persons {...{ personsToShow}} />
+      <Persons personsToShow={personsToShow} deleteHandler={deleteHandler} />
     </div>
   )
 }
