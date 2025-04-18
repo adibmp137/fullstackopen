@@ -2,6 +2,28 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import noteService from './services/notes'
 
+const Notification = ({ message }) => {
+  const notificationStyle = {
+    color: 'green',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+  
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div style={notificationStyle}>
+      {message}
+    </div>
+  )
+}
+
 const Filter = ({ searchedPerson, handleSearchChange }) => {
   return (
     <div>
@@ -26,7 +48,6 @@ const PersonForm = ({ submitForm, newName, handleNameChange, newNumber, handleNu
   )
 }
 
-
 const Persons = ({ personsToShow, deleteHandler }) => {
   return ( 
     <div>
@@ -41,6 +62,7 @@ const Persons = ({ personsToShow, deleteHandler }) => {
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
+  const [errorMessage, setErrorMessage] = useState(null)
   
   useEffect(() => {
     noteService.getAll().then(initialPersons => {setPersons(initialPersons)})
@@ -54,6 +76,12 @@ const App = () => {
       number: newNumber,
     }
     noteService.create(personObject).then(newPerson => setPersons(persons.concat(newPerson)))
+    setErrorMessage(
+      `Added ${newName}`
+    )
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
   }
 
   const handleNameChange = (event) => {
@@ -115,6 +143,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} />
       <Filter {...{ searchedPerson, handleSearchChange }}/>
       <h2>add a new</h2>
       <PersonForm {...{ submitForm, newName, handleNameChange, newNumber, handleNumberChange }} />
