@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import noteService from './services/notes'
 
 const Filter = ({ searchedPerson, handleSearchChange }) => {
   return (
@@ -35,14 +36,9 @@ const Persons = ({ personsToShow}) => {
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
-  const baseUrl = 'http://localhost:3001/persons'
-
+  
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-      })
+    noteService.getAll().then(initialPerson => {setPersons(initialPerson)})
   }, [])
 
   const [newName, setNewName] = useState('')
@@ -52,7 +48,7 @@ const App = () => {
       name: newName,
       number: newNumber,
     }
-    axios.post(baseUrl, personObject).then(r => setPersons(persons.concat(r.data)))
+    noteService.create(personObject).then(newPerson => setPersons(persons.concat(newPerson)))
     setNewName('')
     setNewNumber('')
   }
