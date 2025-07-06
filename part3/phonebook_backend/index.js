@@ -24,20 +24,6 @@ app.use(morgan((tokens, req, res) => {
 
 app.post('/api/persons', async (request, response) => {
     const body = request.body
-
-    if (!body.name || !body.number) {
-        return response.status(400).json({
-            error: 'name or number is missing'
-        })
-    }
-
-    const existing = await People.findOne({ name: { $regex: new RegExp('^' + body.name + '$', 'i') } })
-    if (existing) {
-        return response.status(400).json({
-            error: 'name must be unique'
-        })
-    }
-
     const person = new People({
         name: body.name,
         number: body.number,
@@ -50,6 +36,28 @@ app.post('/api/persons', async (request, response) => {
         .catch(error => {
             response.status(500).json({ error: 'database error', details: error.message })
         })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const { number } = request.body
+
+    if (!number) {
+        return response.status(400).json({ error: 'number is missing' })
+    }
+
+    People.findByIdAndUpdate(
+        request.params.id,
+        { number },
+        { new: true, runValidators: true, context: 'query' }
+    )
+    .then(updatedPerson => {
+        if (updatedPerson) {
+            response.json(updatedPerson)
+        } else {
+            response.status(404).end()
+        }
+    })
+    .catch(error => next(error))
 })
 
 app.get('/', (request, response) => {

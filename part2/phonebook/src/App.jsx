@@ -99,12 +99,18 @@ const App = () => {
       })
       .catch(error => {
         setErrorColor('red')
-        setErrorMessage(`Information of ${newName} has already been removed from server`)
+        if (error.response && error.response.status === 404) {
+          setErrorMessage(`Information of ${newName} has already been removed from server`)
+          setPersons(persons.filter(n => n.id !== targetContact.id))
+        } else if (error.response && error.response.data && error.response.data.error) {
+          setErrorMessage(error.response.data.error)
+        } else {
+          setErrorMessage('An unknown error occurred')
+        }
         setTimeout(() => {
           setErrorColor('green')
           setErrorMessage(null)
         }, 5000)
-        setPersons(persons.filter(n => n.id !== targetContact.id))
         console.log('error')
       })
     }
