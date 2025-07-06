@@ -1,6 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
+const People = require('./models/person')
 
 app.use(express.static('dist'))
 
@@ -20,55 +22,34 @@ app.use(morgan((tokens, req, res) => {
     ].join(' ')
 }))
 
-let persons = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
-
-
-
-
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max)
-}
-
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', async (request, response) => {
     const body = request.body
+
     if (!body.name || !body.number) {
         return response.status(400).json({
             error: 'name or number is missing'
         })
     }
-    if (persons.some(p => p.name.toLowerCase() === body.name.toLowerCase())) {
+
+    const existing = await People.findOne({ name: { $regex: new RegExp('^' + body.name + '$', 'i') } })
+    if (existing) {
         return response.status(400).json({
             error: 'name must be unique'
         })
     }
-    const person = {
-        id: getRandomInt(10000),
+
+    const person = new People({
         name: body.name,
         number: body.number,
-    }
-    persons = persons.concat(person)
-    response.json(person)
+    })
+
+    person.save()
+        .then(savedPerson => {
+            response.json(savedPerson)
+        })
+        .catch(error => {
+            response.status(500).json({ error: 'database error', details: error.message })
+        })
 })
 
 app.get('/', (request, response) => {
@@ -76,34 +57,56 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  People.find({})
+    .then(persons => {
+      response.json(persons)
+    })
+    .catch(error => {
+      response.status(500).json({ error: 'database error', details: error.message })
+    })
 })
 
 app.get('/info', (request, response) => {
     const now = new Date()
-    response.send(`
-        <p>Phonebook has info for ${persons.length} people</p>
-        <p>${now}</p>
-    `)
+    People.countDocuments({})
+        .then(count => {
+            response.send(`
+                <p>Phonebook has info for ${count} people</p>
+                <p>${now}</p>
+            `)
+        })
+        .catch(error => {
+            response.status(500).send('Database error')
+        })
 })
 
 app.get('/api/persons/:id', (request, response) => {
     const id = request.params.id
-    const person = persons.find(p => p.id === id)
-    if (person) {
-        response.json(person)
-      } else {
-        response.status(404).end()
-      }
+    People.findById(id)
+        .then(person => {
+            if (person) {
+                response.json(person)
+            } else {
+                response.status(404).end()
+            }
+        })
+        .catch(error => {
+            response.status(400).json({ error: 'malformatted id' })
+        })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
     const id = request.params.id
-    persons = persons.filter(p => p.id !== id)
-    response.status(204).end()
+    People.findByIdAndDelete(id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => {
+            response.status(400).json({ error: 'malformatted id' })
+        })
 })
 
-const PORT = 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
