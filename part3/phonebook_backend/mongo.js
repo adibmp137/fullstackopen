@@ -24,29 +24,29 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema)
 
 function getRandomInt(max) {
-    return Math.floor(Math.random() * max)
+  return Math.floor(Math.random() * max)
 }
 
 if (process.argv.length > 3) {
-    const person = new Person({
+  const person = new Person({
     id: getRandomInt(10000),
     name: name,
     number: number,
-    })
+  })
 
-    person.save().then(result => {
+  person.save().then(() => {
     console.log('person saved!')
     mongoose.connection.close()
-    })
+  })
 }
 
-if (process.argv.length == 3) {
-    Person.find({}).then(result => {
-    let output = 'phonebook:\n';
+if (process.argv.length === 3) {
+  Person.find({}).then(result => {
+    let output = 'phonebook:\n'
     result.forEach(person => {
-        output += `${person.name} ${person.number}\n`;
-    });
-    console.log(output);
-    mongoose.connection.close();
-    });
+      output += `${person.name} ${person.number}\n`
+    })
+    console.log(output)
+    mongoose.connection.close()
+  })
 }
