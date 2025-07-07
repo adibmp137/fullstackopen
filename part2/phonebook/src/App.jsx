@@ -76,7 +76,21 @@ const App = () => {
       name: newName,
       number: newNumber,
     }
-    noteService.create(personObject).then(newPerson => setPersons(persons.concat(newPerson)))
+    noteService
+      .create(personObject)
+      .then(newPerson => setPersons(persons.concat(newPerson)))
+      .catch(error => {
+        setErrorColor('red')
+        if (error.response && error.response.data && error.response.data.error) {
+          setErrorMessage(error.response.data.error)
+        } else {
+          setErrorMessage('An unknown error occurred')
+        }
+        setTimeout(() => {
+          setErrorColor('green')
+          setErrorMessage(null)
+        }, 5000)
+      })
     setErrorMessage(
       `Added ${newName}`
     )

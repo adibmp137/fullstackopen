@@ -22,7 +22,7 @@ app.use(morgan((tokens, req, res) => {
     ].join(' ')
 }))
 
-app.post('/api/persons', async (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
     const person = new People({
         name: body.name,
