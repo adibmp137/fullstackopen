@@ -28,7 +28,6 @@ app.post('/api/persons', async (request, response) => {
         name: body.name,
         number: body.number,
     })
-
     person.save()
         .then(savedPerson => {
             response.json(savedPerson)
@@ -38,11 +37,9 @@ app.post('/api/persons', async (request, response) => {
 
 app.put('/api/persons/:id', (request, response, next) => {
     const { number } = request.body
-
     if (!number) {
         return response.status(400).json({ error: 'number is missing' })
     }
-
     People.findByIdAndUpdate(
         request.params.id,
         { number },
