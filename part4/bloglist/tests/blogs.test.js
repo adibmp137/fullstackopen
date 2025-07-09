@@ -75,6 +75,15 @@ describe.only('4b test', () => {
     const response = await api.get('/api/blogs')
     assert.strictEqual(response.body.length, listHelper.initialBlogs.length)
   })
+
+  test('unique identifier is named id',  async () => {
+    const response = await api.get('/api/blogs')
+    const blogs = response.body
+    for (const blog of blogs) {
+      assert.ok(blog.id, 'Blog is missing id property')
+      assert.strictEqual(blog._id, undefined)
+    }
+  })
 })
 after(async () => {
   await mongoose.connection.close()
