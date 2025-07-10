@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const Blog = require('../models/blog')
 
 const initialBlogs = [
   {
@@ -81,11 +82,17 @@ const favoriteBlog = (blogs) => {
   return blogs.reduce((fav, blog) => (fav.likes >= blog.likes ? fav : blog))
 }
 
+const blogsInDb = async () => {
+  const blogs = await Blog.find({})
+  return blogs.map(blog => blog.toJSON())
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
   mostLikes,
-  initialBlogs
+  initialBlogs,
+  blogsInDb
 }

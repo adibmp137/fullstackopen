@@ -84,7 +84,31 @@ describe.only('4b test', () => {
       assert.strictEqual(blog._id, undefined)
     }
   })
+
+  test('a valid blog can be added ', async () => {
+    const newBlog = {
+      title: 'Tungtungtung Sahur',
+      author: 'Brain Rot',
+      url: 'http://blog.rotter.com/tungtungtung.html',
+      likes: 69,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await listHelper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, listHelper.initialBlogs.length + 1)
+
+    const contents = blogsAtEnd.map(n => n.title)
+    assert(contents.includes('Tungtungtung Sahur'))
+  })
 })
+
+
+
 after(async () => {
   await mongoose.connection.close()
 })
