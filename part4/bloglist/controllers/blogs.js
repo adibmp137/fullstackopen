@@ -23,4 +23,17 @@ blogRouter.delete('/:id', async (request, response) => {
   response.status(204).end()
 })
 
+// New endpoint to update the number of likes
+blogRouter.put('/:id', async (request, response) => {
+  const body = request.body
+
+  if (!body.likes) {
+    return response.status(400).json({ error: 'Likes are required' })
+  }
+
+  const likes = Number(body.likes)
+  const blog = await Blog.findByIdAndUpdate(request.params.id, { likes }, { new: true })
+  response.json(blog)
+})
+
 module.exports = blogRouter

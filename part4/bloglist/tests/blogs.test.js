@@ -163,9 +163,22 @@ describe.only('4b test', () => {
     const titles = blogsAtEnd.map(b => b.title)
     assert(!titles.includes(blogToDelete.title))
   })
+
+  test('updating a blog increases the number of likes', async () => {
+    const blogsAtStart = await listHelper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+    const newLikes = blogToUpdate.likes + 1
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send({ likes: newLikes })
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const updatedBlog = await Blogs.findById(blogToUpdate.id)
+    assert.strictEqual(updatedBlog.likes, newLikes)
+  })
 })
-
-
 
 after(async () => {
   await mongoose.connection.close()
