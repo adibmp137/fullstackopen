@@ -105,6 +105,24 @@ describe.only('4b test', () => {
     const contents = blogsAtEnd.map(n => n.title)
     assert(contents.includes('Tungtungtung Sahur'))
   })
+
+  test('default likes to 0 when not provided', async () => {
+    const newBlog = {
+      title: 'Bombardino Crocodilo',
+      author: 'Brain Rot',
+      url: 'http://blog.rotter.com/bombardino.html',
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await listHelper.blogsInDb()
+    const blog = blogsAtEnd.find(n => n.title === 'Bombardino Crocodilo')
+    assert.strictEqual(blog.likes, 0)
+  })
 })
 
 
