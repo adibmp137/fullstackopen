@@ -123,6 +123,32 @@ describe.only('4b test', () => {
     const blog = blogsAtEnd.find(n => n.title === 'Bombardino Crocodilo')
     assert.strictEqual(blog.likes, 0)
   })
+
+  test('respondss with status code 400 if title is missing', async () => {
+    const newBlog = {
+      author: 'Brain Rot',
+      url: 'http://blog.rotter.com/bombardino.html',
+      likes: 69,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  })
+
+  test('responds with status code 400 if url is missing', async () => {
+    const newBlog = {
+      title: 'Bombardino Crocodilo',
+      author: 'Brain Rot',
+      likes: 69,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  })
 })
 
 
