@@ -149,6 +149,20 @@ describe.only('4b test', () => {
       .send(newBlog)
       .expect(400)
   })
+
+  test('a blog can be deleted', async () => {
+    const blogsAtStart = await listHelper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await listHelper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1)
+    const titles = blogsAtEnd.map(b => b.title)
+    assert(!titles.includes(blogToDelete.title))
+  })
 })
 
 
