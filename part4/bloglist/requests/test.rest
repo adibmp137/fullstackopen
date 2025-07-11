@@ -6,3 +6,14 @@ Content-Type: application/json
     "name": "Arto Hellas",
     "password": "salainen"
 }
+
+###
+POST http://localhost:3003/api/blogs/
+Content-Type: application/json
+
+{
+    "title": "Tungtungtung Sahur",
+    "author": "Brain Rot",
+    "url": "http://blog.rotter.com/tungtungtung.html",
+    "likes": 69
+}
