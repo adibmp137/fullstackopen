@@ -32,8 +32,12 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY4NzE1MDJkNDAwZmZlOWFmYmZjMzhkYiIsImlhdCI6MTc1MjI2MDE2OH0.LKOc0Xil8pkvzU83LhOlGffu7QoWTGCrCe8AW7XlTGU
 
 {
-    "title": "And Another Blog",
+    "title": "Yet More Blog",
     "author": "Brain Rot",
     "url": "http://blog.rotter.com/tungtungtung.html",
     "likes": 21
 }
+###
+DELETE http://localhost:3003/api/blogs/6871885b6295b9ca7f1ee8c1 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY4NzE1MDJkNDAwZmZlOWFmYmZjMzhkYiIsImlhdCI6MTc1MjI2MDE2OH0.LKOc0Xil8pkvzU83LhOlGffu7QoWTGCrCe8AW7XlTGU
