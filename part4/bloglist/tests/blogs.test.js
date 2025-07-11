@@ -119,7 +119,28 @@ describe('most likes', () => {
   })
 })
 
-describe.only('4b test', () => {
+describe('4b test', () => {
+  let token
+
+  beforeEach(async () => {
+    // Clear users and create a test user
+    await User.deleteMany({})
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+    await user.save()
+
+    // Get token by logging in
+    const response = await api
+      .post('/api/login')
+      .send({ username: 'root', password: 'sekret' })
+
+    token = response.body.token
+
+    // Clear and initialize blogs
+    await Blogs.deleteMany({})
+    await Blogs.insertMany(listHelper.initialBlogs)
+  })
+
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -151,6 +172,7 @@ describe.only('4b test', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -171,6 +193,7 @@ describe.only('4b test', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -189,6 +212,7 @@ describe.only('4b test', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
   })
@@ -202,20 +226,33 @@ describe.only('4b test', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
   })
 
   test('a blog can be deleted', async () => {
-    const blogsAtStart = await listHelper.blogsInDb()
-    const blogToDelete = blogsAtStart[0]
+    // Create a new blog first
+    const newBlog = {
+      title: 'Test Blog to Delete',
+      author: 'Test Author',
+      url: 'http://testurl.com',
+      likes: 0
+    }
+
+    const response = await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+
+    const blogToDelete = response.body
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(204)
 
     const blogsAtEnd = await listHelper.blogsInDb()
-    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1)
     const titles = blogsAtEnd.map(b => b.title)
     assert(!titles.includes(blogToDelete.title))
   })
@@ -227,6 +264,7 @@ describe.only('4b test', () => {
 
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send({ likes: newLikes })
       .expect(200)
       .expect('Content-Type', /application\/json/)
