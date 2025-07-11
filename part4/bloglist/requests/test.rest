@@ -32,7 +32,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY4NzE1MDJkNDAwZmZlOWFmYmZjMzhkYiIsImlhdCI6MTc1MjI2MDE2OH0.LKOc0Xil8pkvzU83LhOlGffu7QoWTGCrCe8AW7XlTGU
 
 {
-    "title": "Another",
+    "title": "And Another Blog",
     "author": "Brain Rot",
     "url": "http://blog.rotter.com/tungtungtung.html",
     "likes": 21
