@@ -31,15 +31,15 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
   const [errorColor, setErrorColor] = useState('red')
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -53,14 +53,14 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({
         username, password,
       })
       window.localStorage.setItem(
         'loggedNoteappUser', JSON.stringify(user)
-      ) 
+      )
       setUser(user)
       setUsername('')
       setPassword('')
@@ -93,7 +93,7 @@ const App = () => {
   const updateLikes = async (id) => {
     const blogToUpdate = blogs.find(b => b.id === id)
     const updatedBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1 }
-    
+
     try {
       const returnedBlog = await blogService.update(id, updatedBlog)
       setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
@@ -135,7 +135,7 @@ const App = () => {
         <form onSubmit={handleLogin}>
           <div>
             username
-              <input
+            <input
               type="text"
               value={username}
               autoComplete="username"
@@ -145,7 +145,7 @@ const App = () => {
           </div>
           <div>
             password
-              <input
+            <input
               type="password"
               value={password}
               autoComplete="current-password"
