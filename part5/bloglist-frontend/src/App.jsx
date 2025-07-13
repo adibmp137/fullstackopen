@@ -106,6 +106,27 @@ const App = () => {
     }
   }
 
+  const deleteBlog = async (id) => {
+    const blogToDelete = blogs.find(b => b.id === id)
+    if (window.confirm(`Remove blog ${blogToDelete.title} by ${blogToDelete.author}`)) {
+      try {
+        await blogService.remove(id)
+        setBlogs(blogs.filter(blog => blog.id !== id))
+        setErrorColor('green')
+        setErrorMessage(`Blog "${blogToDelete.title}" deleted successfully`)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      } catch (exception) {
+        setErrorColor('red')
+        setErrorMessage('Failed to delete blog - unauthorized or server error')
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      }
+    }
+  }
+
   if (user === null) {
     return (
       <div>
@@ -150,7 +171,7 @@ const App = () => {
       {blogs
         .sort((a, b) => b.likes - a.likes)
         .map(blog =>
-          <Blog key={blog.id} blog={blog} updateLikes={updateLikes} />
+          <Blog key={blog.id} blog={blog} updateLikes={updateLikes} deleteBlog={deleteBlog} />
         )}
     </div>
   )
