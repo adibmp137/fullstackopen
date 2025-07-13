@@ -1,12 +1,7 @@
 import { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog , updateLikes }) => {
   const [visible, setVisible] = useState(true)
-  
-  // Debug: Let's see what we're actually receiving
-  console.log('Blog object:', blog)
-  console.log('Blog user:', blog.user)
-  console.log('Blog user type:', typeof blog.user)
 
   const blogStyle = {
     paddingTop: 10,
@@ -26,7 +21,7 @@ const Blog = ({ blog }) => {
           {blog.url}
           <br />
           likes {blog.likes} 
-          <button>like</button>
+          <button onClick={() => updateLikes(blog.id)}>like</button>
           <br />
           {blog.user ? blog.user.name : 'Unknown user'}
         </div>
