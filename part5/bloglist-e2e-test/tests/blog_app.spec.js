@@ -1,12 +1,10 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginWith } = require('./helper')
+const { loginWith, createBlog } = require('./helper')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
-    // Reset the test database
     await request.post('http://localhost:3003/api/testing/reset')
     
-    // Create a test user
     const user = {
       name: 'Test User',
       username: 'testuser',
@@ -60,18 +58,37 @@ describe('Blog app', () => {
     })
 
     test('a new blog can be created', async ({ page }) => {
-      await page.getByRole('button', { name: 'new blog' }).click()
-
-      await page.getByTestId('title-input').fill('Test Blog Title')
-      await page.getByTestId('author-input').fill('Test Author')
-      await page.getByTestId('url-input').fill('http://testblog.com')
-      
-      await page.getByRole('button', { name: 'create' }).click()
+      await createBlog(page, {
+        title: 'Test Blog Title',
+        author: 'Test Author',
+        url: 'http://testblog.com'
+      })
 
       await expect(page.getByText('A new blog Test Blog Title by Test Author added')).toBeVisible()
       
       const blogElement = page.getByText('Test Blog Title Test Author')
       await expect(blogElement).toBeVisible()
+    })
+
+    describe('When a blog exists', () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(page, {
+          title: 'Test Blog Title',
+          author: 'Test Author',
+          url: 'http://testblog.com'
+        })
+      })
+
+      test('a blog can be liked', async ({ page }) => {
+        await page.getByRole('button', { name: 'view' }).click()
+
+        const likesElement = page.getByText('likes')
+        await expect(likesElement).toContainText('likes 0')
+
+        await page.getByRole('button', { name: 'like' }).click()
+
+        await expect(likesElement).toContainText('likes 1')
+      })
     })
   })
 })
