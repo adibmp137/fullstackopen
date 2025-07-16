@@ -10,9 +10,18 @@ describe('Blog app', () => {
       username: 'testuser',
       password: 'testpass'
     }
+
+    const secondUser = {
+      name: 'Second User',
+      username: 'usertwo',
+      password: 'passtwo'
+    }
     
     await request.post('http://localhost:3003/api/users', {
       data: user
+    })
+    await request.post('http://localhost:3003/api/users', {
+      data: secondUser
     })
     
     await page.goto('http://localhost:5174')
@@ -101,6 +110,21 @@ describe('Blog app', () => {
         await expect(page.getByText('Blog "Test Blog Title" deleted successfully')).toBeVisible()
         
         await expect(page.getByText('Test Blog Title Test Author')).not.toBeVisible()
+      })
+
+      test('a blog cannot be deleted by another user', async ({ page }) => {
+        page.on('dialog', async dialog => {
+            await dialog.accept()
+        })
+
+        await page.getByRole('button', { name: 'logout' }).click()
+
+        await loginWith(page, 'usertwo', 'passtwo')
+
+        await page.getByRole('button', { name: 'view' }).click()
+        await page.getByRole('button', { name: 'remove' }).click()
+
+        await expect(page.getByText('Failed to delete blog - unauthorized or server error')).toBeVisible()
       })
     })
   })
