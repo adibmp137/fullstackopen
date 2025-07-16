@@ -136,6 +136,7 @@ const App = () => {
           <div>
             username
             <input
+              data-testid='username'
               type="text"
               value={username}
               autoComplete="username"
@@ -146,6 +147,7 @@ const App = () => {
           <div>
             password
             <input
+              data-testid='password'
               type="password"
               value={password}
               autoComplete="current-password"
