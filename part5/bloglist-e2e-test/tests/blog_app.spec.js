@@ -126,6 +126,56 @@ describe('Blog app', () => {
 
         await expect(page.getByText('Failed to delete blog - unauthorized or server error')).toBeVisible()
       })
+
+      test('blogs are ordered by likes', async ({ page }) => {
+        await createBlog(page, {
+          title: 'Second Blog',
+          author: 'Second Author',
+          url: 'http://secondblog.com'
+        })
+
+        await createBlog(page, {
+          title: 'Third Blog',
+          author: 'Third Author',
+          url: 'http://thirdblog.com'
+        })
+
+        const viewButtons = await page.getByRole('button', { name: 'view' }).all()
+        await viewButtons[0].click()
+        await page.getByText('http://testblog.com').waitFor()
+        await viewButtons[0].click()
+        await page.getByText('http://secondblog.com').waitFor()
+        await viewButtons[0].click()
+        await page.getByText('http://thirdblog.com').waitFor()
+
+        // First blog: 5 likes
+        const firstBlogLikeButton = page.locator('.blog').filter({ hasText: 'http://testblog.com' }).getByRole('button', { name: 'like' })
+        for (let i = 0; i < 5; i++) {
+          await firstBlogLikeButton.click()
+          await page.waitForTimeout(100)
+        }
+
+        // Second blog: 3 likes
+        const secondBlogLikeButton = page.locator('.blog').filter({ hasText: 'http://secondblog.com' }).getByRole('button', { name: 'like' })
+        for (let i = 0; i < 3; i++) {
+          await secondBlogLikeButton.click()
+          await page.waitForTimeout(100)
+        }
+
+        // Third blog: 8 likes
+        const thirdBlogLikeButton = page.locator('.blog').filter({ hasText: 'http://thirdblog.com' }).getByRole('button', { name: 'like' })
+        for (let i = 0; i < 8; i++) {
+          await thirdBlogLikeButton.click()
+          await page.waitForTimeout(100)
+        }
+
+        const blogElements = await page.locator('.blog').all()
+        
+        // Verify the order: Third Blog (8 likes), Test Blog Title (5 likes), Second Blog (3 likes)
+        await expect(blogElements[0]).toContainText('Third Blog')
+        await expect(blogElements[1]).toContainText('Test Blog Title')
+        await expect(blogElements[2]).toContainText('Second Blog')
+      })
     })
   })
 })
