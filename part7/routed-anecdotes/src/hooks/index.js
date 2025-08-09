@@ -14,6 +14,8 @@ export const useField = (type) => {
 
   return {
     type,
+    id: type,
+    name: type,
     value,
     onChange,
     onReset
