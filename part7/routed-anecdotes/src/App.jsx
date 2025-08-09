@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import {
-  BrowserRouter as Router,
-  Routes, Route, Link
+  Routes, 
+  Route, 
+  Link, 
+  useMatch
 } from 'react-router-dom'
 
 const Menu = () => {
@@ -21,10 +23,23 @@ const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote => <li key={anecdote.id} >
+        <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+      </li>)}
     </ul>
   </div>
 )
+
+const Anecdote = ({anecdote}) => {
+  return (
+    <div>
+      <h2>{anecdote.content}</h2>
+      <div>Author: {anecdote.author}</div>
+      <div>Info: {anecdote.info}</div>
+      <div>Votes: {anecdote.votes}</div>
+    </div>
+  )
+}
 
 const About = () => (
   <div>
@@ -42,6 +57,7 @@ const About = () => (
 
 const Footer = () => (
   <div>
+    <br />
     Anecdote app for <a href='https://fullstackopen.com/'>Full Stack Open</a>.
 
     See <a href='https://github.com/fullstack-hy2020/routed-anecdotes/blob/master/src/App.js'>https://github.com/fullstack-hy2020/routed-anecdotes/blob/master/src/App.js</a> for the source code.
@@ -126,17 +142,23 @@ const App = () => {
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
+  const match = useMatch('/anecdotes/:id')
+  const anecdote = match 
+    ? anecdotes.find(anecdote => anecdote.id === Number(match.params.id))
+    : null
+
   return (
     <div>
       <h1>Software anecdotes</h1>
-      <Router>
+      <div>
         <Menu />
         <Routes>
+          <Route path="/anecdotes/:id" element={<Anecdote anecdote={anecdote} />} />
           <Route path="/create" element={<CreateNew addNew={addNew} />} />
           <Route path="/about" element={<About />} />
           <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
         </Routes>
-      </Router>
+      </div>
       <Footer />
     </div>
   )
