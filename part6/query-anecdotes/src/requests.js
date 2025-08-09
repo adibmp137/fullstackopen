@@ -1,4 +1,9 @@
 import axios from 'axios'
 
-export const getNotes = () =>
-  axios.get('http://localhost:3002/anecdotes').then(res => res.data)
+const baseUrl = 'http://localhost:3002/anecdotes'
+
+export const get = () =>
+  axios.get(baseUrl).then(res => res.data)
+
+export const create = newNote =>
+  axios.post(baseUrl, newNote).then(res => res.data)
