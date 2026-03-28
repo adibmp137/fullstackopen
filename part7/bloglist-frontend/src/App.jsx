@@ -6,6 +6,7 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Togglable from "./components/Togglable";
 import { showNotification } from "./reducers/notificationReducer";
+import { initializeBlogs, createBlog } from "./reducers/blogReducer";
 
 const Notification = () => {
   const notification = useSelector((state) => state.notification);
@@ -27,16 +28,16 @@ const Notification = () => {
 };
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const blogFormRef = useRef();
   const dispatch = useDispatch();
+  const blogs = useSelector((state) => state.blogs);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    dispatch(initializeBlogs());
+  }, [dispatch]);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
@@ -73,8 +74,7 @@ const App = () => {
 
   const addBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility();
-    const newBlog = await blogService.create(blogObject);
-    setBlogs(blogs.concat(newBlog));
+    const newBlog = await dispatch(createBlog(blogObject));
     dispatch(
       showNotification(
         `a new blog ${newBlog.title} by ${newBlog.author} added`,
@@ -89,7 +89,8 @@ const App = () => {
 
     try {
       const returnedBlog = await blogService.update(id, updatedBlog);
-      setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnedBlog)));
+      // For now, re-fetch all blogs after update
+      dispatch(initializeBlogs());
     } catch (exception) {
       dispatch(showNotification("Failed to update likes", "red"));
     }
@@ -104,7 +105,8 @@ const App = () => {
     ) {
       try {
         await blogService.remove(id);
-        setBlogs(blogs.filter((blog) => blog.id !== id));
+        // For now, re-fetch all blogs after delete
+        dispatch(initializeBlogs());
         dispatch(
           showNotification(
             `Blog "${blogToDelete.title}" deleted successfully`,
