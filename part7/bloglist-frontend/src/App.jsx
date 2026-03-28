@@ -141,16 +141,22 @@ const App = () => {
     padding: 5,
   };
 
+  const navStyle = {
+    backgroundColor: "lightgrey",
+    padding: 10,
+  };
+
   return (
     <div>
-      <div>
+      <div style={navStyle}>
         <Link style={padding} to="/">
           blogs
         </Link>
         <Link style={padding} to="/users">
           users
         </Link>
-        {user.name} logged-in <button onClick={logOut}>logout</button>
+        <span style={padding}>{user.name} logged-in</span>
+        <button onClick={logOut}>logout</button>
       </div>
       <h2>blog app</h2>
       <Notification />
