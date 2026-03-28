@@ -15,21 +15,14 @@ import { setUser, clearUser } from "./reducers/userReducer";
 
 const Notification = () => {
   const notification = useSelector((state) => state.notification);
-  const notificationStyle = {
-    color: notification.color,
-    background: "lightgrey",
-    fontSize: 20,
-    borderStyle: "solid",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-  };
 
   if (notification.message === null) {
     return null;
   }
 
-  return <div style={notificationStyle}>{notification.message}</div>;
+  const className = `notification ${notification.color === "green" ? "success" : "error"}`;
+
+  return <div className={className}>{notification.message}</div>;
 };
 
 const BlogList = ({ blogs, blogFormRef, addBlog }) => {
@@ -105,12 +98,12 @@ const App = () => {
 
   if (user === null) {
     return (
-      <div>
+      <div className="login-form">
         <h2>Log in to application</h2>
         <Notification />
         <form onSubmit={handleLogin}>
           <div>
-            username
+            <label>username</label>
             <input
               data-testid="username"
               type="text"
@@ -121,7 +114,7 @@ const App = () => {
             />
           </div>
           <div>
-            password
+            <label>password</label>
             <input
               data-testid="password"
               type="password"
@@ -137,27 +130,14 @@ const App = () => {
     );
   }
 
-  const padding = {
-    padding: 5,
-  };
-
-  const navStyle = {
-    backgroundColor: "lightgrey",
-    padding: 10,
-  };
-
   return (
     <div>
-      <div style={navStyle}>
-        <Link style={padding} to="/">
-          blogs
-        </Link>
-        <Link style={padding} to="/users">
-          users
-        </Link>
-        <span style={padding}>{user.name} logged-in</span>
+      <nav>
+        <Link to="/">blogs</Link>
+        <Link to="/users">users</Link>
+        <span>{user.name} logged-in</span>
         <button onClick={logOut}>logout</button>
-      </div>
+      </nav>
       <h2>blog app</h2>
       <Notification />
       <Routes>

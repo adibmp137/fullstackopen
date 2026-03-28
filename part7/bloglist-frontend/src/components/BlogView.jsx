@@ -55,30 +55,36 @@ const BlogView = () => {
   };
 
   return (
-    <div>
+    <div className="blog-view">
       <h2>
         {blog.title} {blog.author}
       </h2>
       <a href={blog.url}>{blog.url}</a>
-      <div>
+      <div className="likes">
         {blog.likes} likes <button onClick={handleLike}>like</button>
       </div>
-      <div>added by {blog.user ? blog.user.name : "Unknown user"}</div>
-      <button onClick={handleDelete}>remove</button>
-      <h3>comments</h3>
-      <form onSubmit={handleComment}>
-        <input
-          type="text"
-          value={comment}
-          onChange={({ target }) => setComment(target.value)}
-        />
-        <button type="submit">add comment</button>
-      </form>
-      <ul>
-        {blog.comments
-          ? blog.comments.map((c, i) => <li key={i}>{c}</li>)
-          : null}
-      </ul>
+      <div className="user-info">
+        added by {blog.user ? blog.user.name : "Unknown user"}
+      </div>
+      <button className="remove" onClick={handleDelete}>
+        remove
+      </button>
+      <div className="comments">
+        <h3>comments</h3>
+        <form onSubmit={handleComment}>
+          <input
+            type="text"
+            value={comment}
+            onChange={({ target }) => setComment(target.value)}
+          />
+          <button type="submit">add comment</button>
+        </form>
+        <ul>
+          {blog.comments
+            ? blog.comments.map((c, i) => <li key={i}>{c}</li>)
+            : null}
+        </ul>
+      </div>
     </div>
   );
 };
