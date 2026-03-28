@@ -6,7 +6,12 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Togglable from "./components/Togglable";
 import { showNotification } from "./reducers/notificationReducer";
-import { initializeBlogs, createBlog } from "./reducers/blogReducer";
+import {
+  initializeBlogs,
+  createBlog,
+  likeBlog,
+  removeBlog,
+} from "./reducers/blogReducer";
 
 const Notification = () => {
   const notification = useSelector((state) => state.notification);
@@ -83,33 +88,21 @@ const App = () => {
     );
   };
 
-  const updateLikes = async (id) => {
-    const blogToUpdate = blogs.find((b) => b.id === id);
-    const updatedBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1 };
-
+  const updateLikes = async (blog) => {
     try {
-      const returnedBlog = await blogService.update(id, updatedBlog);
-      // For now, re-fetch all blogs after update
-      dispatch(initializeBlogs());
+      await dispatch(likeBlog(blog));
     } catch (exception) {
       dispatch(showNotification("Failed to update likes", "red"));
     }
   };
 
-  const deleteBlog = async (id) => {
-    const blogToDelete = blogs.find((b) => b.id === id);
-    if (
-      window.confirm(
-        `Remove blog ${blogToDelete.title} by ${blogToDelete.author}`,
-      )
-    ) {
+  const deleteBlog = async (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       try {
-        await blogService.remove(id);
-        // For now, re-fetch all blogs after delete
-        dispatch(initializeBlogs());
+        await dispatch(removeBlog(blog.id));
         dispatch(
           showNotification(
-            `Blog "${blogToDelete.title}" deleted successfully`,
+            `Blog "${blog.title}" deleted successfully`,
             "green",
           ),
         );
@@ -169,7 +162,7 @@ const App = () => {
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
         <BlogForm createBlog={addBlog} />
       </Togglable>
-      {blogs
+      {[...blogs]
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
           <Blog
