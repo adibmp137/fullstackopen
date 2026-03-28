@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Routes, Route, Link } from "react-router-dom";
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
+import Users from "./components/Users";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Togglable from "./components/Togglable";
@@ -31,6 +33,26 @@ const Notification = () => {
   }
 
   return <div style={notificationStyle}>{notification.message}</div>;
+};
+
+const BlogList = ({ blogs, blogFormRef, addBlog, updateLikes, deleteBlog }) => {
+  return (
+    <div>
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <BlogForm createBlog={addBlog} />
+      </Togglable>
+      {[...blogs]
+        .sort((a, b) => b.likes - a.likes)
+        .map((blog) => (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            updateLikes={updateLikes}
+            deleteBlog={deleteBlog}
+          />
+        ))}
+    </div>
+  );
 };
 
 const App = () => {
@@ -152,27 +174,38 @@ const App = () => {
     );
   }
 
+  const padding = {
+    padding: 5,
+  };
+
   return (
     <div>
-      <h2>blogs</h2>
-      <Notification />
-      <p>
+      <div>
+        <Link style={padding} to="/">
+          blogs
+        </Link>
+        <Link style={padding} to="/users">
+          users
+        </Link>
         {user.name} logged-in <button onClick={logOut}>logout</button>
-      </p>
-      <h2>create new</h2>
-      <Togglable buttonLabel="new blog" ref={blogFormRef}>
-        <BlogForm createBlog={addBlog} />
-      </Togglable>
-      {[...blogs]
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            updateLikes={updateLikes}
-            deleteBlog={deleteBlog}
-          />
-        ))}
+      </div>
+      <h2>blog app</h2>
+      <Notification />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <BlogList
+              blogs={blogs}
+              blogFormRef={blogFormRef}
+              addBlog={addBlog}
+              updateLikes={updateLikes}
+              deleteBlog={deleteBlog}
+            />
+          }
+        />
+        <Route path="/users" element={<Users />} />
+      </Routes>
     </div>
   );
 };
