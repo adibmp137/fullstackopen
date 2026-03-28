@@ -1,0 +1,184 @@
+import { useState, useEffect, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import Blog from "./components/Blog";
+import BlogForm from "./components/BlogForm";
+import blogService from "./services/blogs";
+import loginService from "./services/login";
+import Togglable from "./components/Togglable";
+import { showNotification } from "./reducers/notificationReducer";
+
+const Notification = () => {
+  const notification = useSelector((state) => state.notification);
+  const notificationStyle = {
+    color: notification.color,
+    background: "lightgrey",
+    fontSize: 20,
+    borderStyle: "solid",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  };
+
+  if (notification.message === null) {
+    return null;
+  }
+
+  return <div style={notificationStyle}>{notification.message}</div>;
+};
+
+const App = () => {
+  const [blogs, setBlogs] = useState([]);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [user, setUser] = useState(null);
+  const blogFormRef = useRef();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    blogService.getAll().then((blogs) => setBlogs(blogs));
+  }, []);
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+      blogService.setToken(user.token);
+    }
+  }, []);
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    try {
+      const user = await loginService.login({
+        username,
+        password,
+      });
+      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
+      blogService.setToken(user.token);
+      setUser(user);
+      setUsername("");
+      setPassword("");
+    } catch (exception) {
+      dispatch(showNotification("Wrong username or password", "red"));
+    }
+  };
+
+  const logOut = () => {
+    window.localStorage.removeItem("loggedBlogappUser");
+    setUser(null);
+    blogService.setToken(null);
+  };
+
+  const addBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility();
+    const newBlog = await blogService.create(blogObject);
+    setBlogs(blogs.concat(newBlog));
+    dispatch(
+      showNotification(
+        `a new blog ${newBlog.title} by ${newBlog.author} added`,
+        "green",
+      ),
+    );
+  };
+
+  const updateLikes = async (id) => {
+    const blogToUpdate = blogs.find((b) => b.id === id);
+    const updatedBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1 };
+
+    try {
+      const returnedBlog = await blogService.update(id, updatedBlog);
+      setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnedBlog)));
+    } catch (exception) {
+      dispatch(showNotification("Failed to update likes", "red"));
+    }
+  };
+
+  const deleteBlog = async (id) => {
+    const blogToDelete = blogs.find((b) => b.id === id);
+    if (
+      window.confirm(
+        `Remove blog ${blogToDelete.title} by ${blogToDelete.author}`,
+      )
+    ) {
+      try {
+        await blogService.remove(id);
+        setBlogs(blogs.filter((blog) => blog.id !== id));
+        dispatch(
+          showNotification(
+            `Blog "${blogToDelete.title}" deleted successfully`,
+            "green",
+          ),
+        );
+      } catch (exception) {
+        dispatch(
+          showNotification(
+            "Failed to delete blog - unauthorized or server error",
+            "red",
+          ),
+        );
+      }
+    }
+  };
+
+  if (user === null) {
+    return (
+      <div>
+        <h2>Log in to application</h2>
+        <Notification />
+        <form onSubmit={handleLogin}>
+          <div>
+            username
+            <input
+              data-testid="username"
+              type="text"
+              value={username}
+              autoComplete="username"
+              name="Username"
+              onChange={({ target }) => setUsername(target.value)}
+            />
+          </div>
+          <div>
+            password
+            <input
+              data-testid="password"
+              type="password"
+              value={password}
+              autoComplete="current-password"
+              name="Password"
+              onChange={({ target }) => setPassword(target.value)}
+            />
+          </div>
+          <button type="submit">login</button>
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h2>blogs</h2>
+      <Notification />
+      <p>
+        {user.name} logged-in <button onClick={logOut}>logout</button>
+      </p>
+      <h2>create new</h2>
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <BlogForm createBlog={addBlog} />
+      </Togglable>
+      {blogs
+        .sort((a, b) => b.likes - a.likes)
+        .map((blog) => (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            updateLikes={updateLikes}
+            deleteBlog={deleteBlog}
+          />
+        ))}
+    </div>
+  );
+};
+
+export default App;
