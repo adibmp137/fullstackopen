@@ -1,9 +1,7 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
-const Blog = ({ blog, updateLikes, deleteBlog }) => {
-  const [visible, setVisible] = useState(true);
-
+const Blog = ({ blog }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -12,32 +10,11 @@ const Blog = ({ blog, updateLikes, deleteBlog }) => {
     marginBottom: 5,
   };
 
-  if (!visible) {
-    return (
-      <div style={blogStyle} className="blog">
-        <div>
-          {blog.title} {blog.author}
-          <button onClick={() => setVisible(!visible)}>hide</button>
-          <br />
-          {blog.url}
-          <br />
-          likes {blog.likes}
-          <button onClick={() => updateLikes(blog)}>like</button>
-          <br />
-          {blog.user ? blog.user.name : "Unknown user"}
-          <br />
-          <button onClick={() => deleteBlog(blog)}>remove</button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div style={blogStyle}>
-      <div>
+    <div style={blogStyle} className="blog">
+      <Link to={`/blogs/${blog.id}`}>
         {blog.title} {blog.author}
-        <button onClick={() => setVisible(!visible)}>view</button>
-      </div>
+      </Link>
     </div>
   );
 };
@@ -47,16 +24,7 @@ Blog.propTypes = {
     id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     author: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired,
-    likes: PropTypes.number.isRequired,
-    user: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      username: PropTypes.string,
-    }),
   }).isRequired,
-  updateLikes: PropTypes.func.isRequired,
-  deleteBlog: PropTypes.func.isRequired,
 };
 
 export default Blog;

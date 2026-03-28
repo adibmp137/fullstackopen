@@ -3,18 +3,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { Routes, Route, Link } from "react-router-dom";
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
+import BlogView from "./components/BlogView";
 import Users from "./components/Users";
 import User from "./components/User";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Togglable from "./components/Togglable";
 import { showNotification } from "./reducers/notificationReducer";
-import {
-  initializeBlogs,
-  createBlog,
-  likeBlog,
-  removeBlog,
-} from "./reducers/blogReducer";
+import { initializeBlogs, createBlog } from "./reducers/blogReducer";
 import { setUser, clearUser } from "./reducers/userReducer";
 
 const Notification = () => {
@@ -36,7 +32,7 @@ const Notification = () => {
   return <div style={notificationStyle}>{notification.message}</div>;
 };
 
-const BlogList = ({ blogs, blogFormRef, addBlog, updateLikes, deleteBlog }) => {
+const BlogList = ({ blogs, blogFormRef, addBlog }) => {
   return (
     <div>
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
@@ -45,12 +41,7 @@ const BlogList = ({ blogs, blogFormRef, addBlog, updateLikes, deleteBlog }) => {
       {[...blogs]
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            updateLikes={updateLikes}
-            deleteBlog={deleteBlog}
-          />
+          <Blog key={blog.id} blog={blog} />
         ))}
     </div>
   );
@@ -112,35 +103,6 @@ const App = () => {
     );
   };
 
-  const updateLikes = async (blog) => {
-    try {
-      await dispatch(likeBlog(blog));
-    } catch (exception) {
-      dispatch(showNotification("Failed to update likes", "red"));
-    }
-  };
-
-  const deleteBlog = async (blog) => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      try {
-        await dispatch(removeBlog(blog.id));
-        dispatch(
-          showNotification(
-            `Blog "${blog.title}" deleted successfully`,
-            "green",
-          ),
-        );
-      } catch (exception) {
-        dispatch(
-          showNotification(
-            "Failed to delete blog - unauthorized or server error",
-            "red",
-          ),
-        );
-      }
-    }
-  };
-
   if (user === null) {
     return (
       <div>
@@ -200,13 +162,12 @@ const App = () => {
               blogs={blogs}
               blogFormRef={blogFormRef}
               addBlog={addBlog}
-              updateLikes={updateLikes}
-              deleteBlog={deleteBlog}
             />
           }
         />
         <Route path="/users" element={<Users />} />
         <Route path="/users/:id" element={<User />} />
+        <Route path="/blogs/:id" element={<BlogView />} />
       </Routes>
     </div>
   );
