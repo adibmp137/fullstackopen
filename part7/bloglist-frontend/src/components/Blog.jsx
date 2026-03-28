@@ -1,13 +1,24 @@
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import PropTypes from "prop-types";
+import Card from "@mui/material/Card";
+import CardActionArea from "@mui/material/CardActionArea";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
 
 const Blog = ({ blog }) => {
   return (
-    <div className="blog">
-      <Link to={`/blogs/${blog.id}`}>
-        {blog.title} {blog.author}
-      </Link>
-    </div>
+    <Card sx={{ mb: 1.5 }} elevation={1}>
+      <CardActionArea component={RouterLink} to={`/blogs/${blog.id}`}>
+        <CardContent sx={{ py: 1.5, "&:last-child": { pb: 1.5 } }}>
+          <Typography variant="body1" fontWeight={500}>
+            {blog.title}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {blog.author}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
+    </Card>
   );
 };
 

@@ -11,7 +11,7 @@ test("form calls event handler with right details when a new blog is created", a
   const title = screen.getByPlaceholderText("title");
   const author = screen.getByPlaceholderText("author");
   const url = screen.getByPlaceholderText("url");
-  const button = screen.getByText("create");
+  const button = screen.getByText("Create");
 
   await user.type(title, "Test Blog");
   await user.type(author, "Test Author");

@@ -1,4 +1,7 @@
 import { useState } from "react";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
 
 const BlogForm = ({ createBlog }) => {
   const [title, setTitle] = useState("");
@@ -7,11 +10,7 @@ const BlogForm = ({ createBlog }) => {
 
   const addBlog = (event) => {
     event.preventDefault();
-    createBlog({
-      title: title,
-      author: author,
-      url: url,
-    });
+    createBlog({ title, author, url });
     setTitle("");
     setAuthor("");
     setUrl("");
@@ -19,40 +18,47 @@ const BlogForm = ({ createBlog }) => {
 
   return (
     <form onSubmit={addBlog}>
-      <div>
-        title
-        <input
+      <Stack spacing={2}>
+        <TextField
+          label="Title"
           data-testid="title-input"
           type="text"
           value={title}
           name="Title"
-          onChange={({ target }) => setTitle(target.value)}
           placeholder="title"
+          fullWidth
+          size="small"
+          variant="outlined"
+          onChange={({ target }) => setTitle(target.value)}
         />
-      </div>
-      <div>
-        author
-        <input
+        <TextField
+          label="Author"
           data-testid="author-input"
           type="text"
           value={author}
           name="Author"
-          onChange={({ target }) => setAuthor(target.value)}
           placeholder="author"
+          fullWidth
+          size="small"
+          variant="outlined"
+          onChange={({ target }) => setAuthor(target.value)}
         />
-      </div>
-      <div>
-        url
-        <input
+        <TextField
+          label="URL"
           data-testid="url-input"
           type="text"
           value={url}
           name="Url"
-          onChange={({ target }) => setUrl(target.value)}
           placeholder="url"
+          fullWidth
+          size="small"
+          variant="outlined"
+          onChange={({ target }) => setUrl(target.value)}
         />
-      </div>
-      <button type="submit">create</button>
+        <Button type="submit" variant="contained">
+          Create
+        </Button>
+      </Stack>
     </form>
   );
 };
